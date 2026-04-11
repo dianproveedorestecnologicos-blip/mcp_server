@@ -9,7 +9,7 @@ mcp = FastMCP(
     name="Inventario MCP",
     instructions=(
         "Servidor MCP para administrar inventario en MySQL. "
-        "Permite listar, buscar, agregar, actualizar stock y eliminar productos."
+        "Permite listar, buscar, agregar, actualizar stock y eliminar productos.",
     ),
 )
 
