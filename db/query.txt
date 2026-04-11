@@ -1,0 +1,22 @@
+CREATE DATABASE IF NOT EXISTS mcp_inventario
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+USE mcp_inventario;
+
+CREATE TABLE productos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(150) NOT NULL,
+    sku VARCHAR(50) NOT NULL UNIQUE,
+    stock INT NOT NULL DEFAULT 0,
+    precio DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+    categoria VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+INSERT INTO productos (nombre, sku, stock, precio, categoria)
+VALUES
+('Teclado Logitech K120', 'TEC-001', 15, 65000.00, 'Periféricos'),
+('Mouse Logitech M90', 'MOU-001', 20, 35000.00, 'Periféricos'),
+('Monitor LG 24"', 'MON-001', 8, 520000.00, 'Monitores');
