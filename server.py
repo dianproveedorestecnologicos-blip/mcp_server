@@ -1,15 +1,19 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import Optional, List
+
+#pydantic para validacion de datos y definicion de modelos
 from pydantic import BaseModel, Field
 from mcp.server.fastmcp import FastMCP
+
 from db import get_connection
 
 mcp = FastMCP(
     name="Inventario MCP",
     instructions=(
         "Servidor MCP para administrar inventario en MySQL. "
-        "Permite listar, buscar, agregar, actualizar stock y eliminar productos.",
+        "Permite listar, buscar, agregar, actualizar stock y eliminar productos."
     ),
 )
 
@@ -18,14 +22,14 @@ class Producto(BaseModel):
     nombre: str = Field(..., min_length=1)
     sku: str = Field(..., min_length=1)
     stock: int = Field(..., ge=0)
-    precio: float = Field(..., ge=0)
+    precio: Decimal = Field(..., ge=0)
     categoria: str = Field(..., min_length=1)
 
 class ProductoInput(BaseModel):
     nombre: str = Field(..., min_length=1)
     sku: str = Field(..., min_length=1)
     stock: int = Field(..., ge=0)
-    precio: float = Field(..., ge=0)
+    precio: Decimal = Field(..., ge=0)
     categoria: str = Field(..., min_length=1)
 
 @mcp.tool()
@@ -51,6 +55,8 @@ def listar_productos(limit: int = 20) -> List[Producto]:
 def buscar_producto(texto: str) -> List[Producto]:
     """Busca productos por nombre o SKU."""
     texto = texto.strip()
+    if not texto:
+        raise ValueError("Debes enviar un texto de busqueda no vacio.")
     criterio = f"%{texto}%"
 
     conn = get_connection()

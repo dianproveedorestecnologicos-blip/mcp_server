@@ -1,141 +1,100 @@
-# 🧠 MCP Inventario - Guía Completa (Python + MySQL + Claude Desktop)
+# MCP Inventario - Guia de uso (Python + MySQL + Claude Desktop)
 
-Este proyecto implementa un **servidor MCP (Model Context Protocol)** en Python para gestionar un inventario, conectado a una base de datos MySQL (Laragon) y consumido desde **Claude Desktop**.
+Servidor MCP en Python para administrar inventario en MySQL/MariaDB.
 
----
+## Arquitectura
 
-# 📌 Arquitectura
-
-```
+```text
 Claude Desktop
-      ↓
+      ->
 MCP Server (Python)
-      ↓
+      ->
 MySQL / MariaDB (Laragon)
 ```
 
----
+## Requisitos
 
-# ⚙️ Requisitos
+- Python 3.10+
+- Laragon con MySQL/MariaDB activo
+- Claude Desktop
+- Windows (esta guia usa rutas Windows)
 
-* Python 3.10 o superior
-* Laragon (MySQL o MariaDB activo)
-* Claude Desktop instalado
-* Windows
+## Estructura del proyecto
 
----
-
-# 📁 Estructura del proyecto
-
-```
+```text
 C:\laragon\www\mcp_server
-│
-├── server.py
-├── db.py
-├── requirements.txt
-└── venv/
+|- .env.example
+|- .gitignore
+|- PROJECT_CONTEXT.md
+|- Readme.md
+|- db.py
+|- requirements.txt
+|- server.py
+|- data/
+|  |- inventario.json
+|- db/
+|  |- query.txt
+|- venv/
 ```
 
----
+## 1) Crear y activar entorno virtual
 
-# 1️⃣ Crear el proyecto
-
-```bash
-cd C:\laragon\www
-mkdir mcp_server
-cd mcp_server
-```
-
----
-
-# 2️⃣ Crear entorno virtual
-
-```bash
+```powershell
+cd C:\laragon\www\mcp_server
 python -m venv venv
-venv\Scripts\activate
+.\venv\Scripts\Activate.ps1
 ```
 
----
+## 2) Instalar dependencias
 
-# 3️⃣ Instalar dependencias
-
-```bash
-pip install mcp pydantic pymysql
+```powershell
+pip install -r requirements.txt
 ```
 
-Crear `requirements.txt`:
+Dependencias actuales:
 
-```txt
-mcp
-pydantic
-pymysql
+- mcp
+- pydantic
+- pymysql
+- python-dotenv
+
+## 3) Configurar base de datos
+
+Ejecuta el SQL de `db/query.txt` en MySQL.
+
+## 4) Configurar variables de entorno
+
+Crea un `.env` local a partir de `.env.example`:
+
+```env
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_USER=tu_usuario
+DB_PASSWORD=tu_password
+DB_NAME=mcp_inventario
 ```
 
----
+Notas:
 
-# 4️⃣ Configurar base de datos
+- `DB_USER` y `DB_NAME` son obligatorias.
+- `DB_PORT` debe ser un numero entero valido.
+- `.env` esta ignorado por Git.
 
-```sql
-CREATE DATABASE IF NOT EXISTS mcp_inventario
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
+## 5) Ejecutar servidor MCP
 
-USE mcp_inventario;
-
-CREATE TABLE productos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(150) NOT NULL,
-    sku VARCHAR(50) NOT NULL UNIQUE,
-    stock INT NOT NULL DEFAULT 0,
-    precio DECIMAL(15,2) NOT NULL DEFAULT 0.00,
-    categoria VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-```
-
----
-
-# 5️⃣ Configurar conexión
-
-Archivo `db.py`:
-
-```python
-import pymysql
-
-def get_connection():
-    return pymysql.connect(
-        host="127.0.0.1",
-        port=3306,
-        user="root",
-        password="",
-        database="mcp_inventario",
-        cursorclass=pymysql.cursors.DictCursor,
-        autocommit=True
-    )
-```
-
----
-
-# 6️⃣ Ejecutar MCP
-
-```bash
+```powershell
 python server.py
 ```
 
-✔ Si no hay errores → OK
-
----
-
-# 7️⃣ Configurar Claude Desktop
+## 6) Configurar Claude Desktop
 
 Archivo:
 
-```
+```text
 %APPDATA%\Claude\claude_desktop_config.json
 ```
 
-Contenido:
+Ejemplo:
 
 ```json
 {
@@ -150,36 +109,25 @@ Contenido:
 }
 ```
 
----
+## Herramientas MCP disponibles
 
-# 8️⃣ Probar
+- `listar_productos(limit=20)`
+- `buscar_producto(texto)`
+- `obtener_producto_por_id(id_producto)`
+- `agregar_producto(producto)`
+- `actualizar_stock(id_producto, nuevo_stock)`
+- `eliminar_producto(id_producto)`
 
-Ejemplos:
+## Buenas practicas aplicadas
 
-* Lista los productos
-* Busca TEC-001
-* Agrega un producto
+- Credenciales fuera del codigo fuente (`.env`).
+- Validacion de variables de entorno obligatorias en conexion de DB.
+- Uso de `Decimal` para precios en lugar de `float`.
+- Validacion para evitar busquedas vacias.
+- `.gitignore` con patrones basicos de Python.
 
----
+## Problemas comunes
 
-# ⚠️ Problemas comunes
-
-* Error rutas → validar paths
-* Error MySQL → revisar Laragon
-* MCP no aparece → reiniciar Claude
-
----
-
-# 🚀 Mejoras futuras
-
-* Movimientos de inventario
-* Paginación
-* .env
-* Docker
-* MCP remoto
-
----
-
-# 🧾 Resumen
-
-MCP = capa de negocio para IA.
+- No conecta a MySQL: validar variables en `.env`.
+- Error de puerto: revisar `DB_PORT`.
+- Claude no ve el servidor: reiniciar Claude Desktop y revisar rutas.
