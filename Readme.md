@@ -74,12 +74,6 @@ DB_PASSWORD=tu_password
 DB_NAME=mcp_inventario
 ```
 
-Notas:
-
-- `DB_USER` y `DB_NAME` son obligatorias.
-- `DB_PORT` debe ser un numero entero valido.
-- `.env` esta ignorado por Git.
-
 ## 5) Ejecutar servidor MCP
 
 ```powershell
